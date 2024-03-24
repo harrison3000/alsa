@@ -43,6 +43,8 @@ const (
 	cmdControlCardInfo      uintptr = 0x5501
 	cmdControlPCMNextDevice uintptr = 0x5530
 	cmdControlPCMInfo       uintptr = 0x5531
+
+	cmdSeqPVersion uintptr = 0x5300
 )
 
 const (

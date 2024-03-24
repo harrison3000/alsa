@@ -2,11 +2,15 @@ package alsa
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"syscall"
 )
 
 type ioctl_e uintptr
+type file_handle struct {
+	*os.File
+}
 
 func (c ioctl_e) String() string {
 	mode := c >> 30 & 0x03
@@ -38,6 +42,7 @@ func ioctl(fd uintptr, c ioctl_e, ptr interface{}) error {
 	return nil
 }
 
+// gstr converts a null terminated slice of bytes into a string
 func gstr(c []byte) string {
 	for i, v := range c {
 		if v == 0 {
@@ -53,4 +58,15 @@ func ioctl_encode(mode byte, size uint16, cmd uintptr) ioctl_e {
 
 func ioctl_encode_ptr(mode byte, ref interface{}, cmd uintptr) ioctl_e {
 	return ioctl_encode(mode, uint16(reflect.TypeOf(ref).Elem().Size()), cmd)
+}
+
+func (fh *file_handle) ioctlRead(cmd uintptr, dest interface{}) error {
+	t := reflect.TypeOf(dest)
+	if t.Kind() != reflect.Pointer {
+		panic("destination must be a pointer")
+	}
+
+	ioe := ioctl_encode(cmdRead, uint16(t.Elem().Size()), cmd)
+
+	return ioctl(fh.Fd(), ioe, dest)
 }
