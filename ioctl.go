@@ -52,6 +52,22 @@ func gstr(c []byte) string {
 	return string(c)
 }
 
+// str2cstr converts a Go string into a null terminated string and writes it into the slice
+// if the string is bigger than the slice capacity it gets truncated to fit
+func str2cstr(s string, dest []byte) {
+	dest = dest[:0]
+	maxLen := cap(dest)
+	if len(s) >= maxLen {
+		//TODO truncate at unicode codepoint and just byte wise
+		s = s[:maxLen-1]
+	}
+	dest = append(dest, s...)
+	dest = append(dest, 0)
+
+	//to make the IDE stop complaining about dest value no being used
+	_ = dest
+}
+
 func ioctl_encode(mode byte, size uint16, cmd uintptr) ioctl_e {
 	return ioctl_e(mode)<<30 | ioctl_e(size)<<16 | ioctl_e(cmd)
 }

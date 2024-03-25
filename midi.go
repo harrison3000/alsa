@@ -34,12 +34,7 @@ func NewSequencerClient(name string) (*SeqPort, error) {
 		return nil, err
 	}
 
-	if len(name) > 63 {
-		name = name[:63]
-	}
-	namebs := clInfo.Name[:0]
-	namebs = append(namebs, name...)
-	namebs = append(namebs, 0)
+	str2cstr(name, clInfo.Name[:])
 
 	err = port.fh.ioctlWrite(cmdSeqSetClientInfo, &clInfo)
 	if err != nil {
