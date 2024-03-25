@@ -61,12 +61,24 @@ func ioctl_encode_ptr(mode byte, ref interface{}, cmd uintptr) ioctl_e {
 }
 
 func (fh *file_handle) ioctlRead(cmd uintptr, dest interface{}) error {
+	return fh.ioctl(cmdRead, cmd, dest)
+}
+
+func (fh *file_handle) ioctlRW(cmd uintptr, dest interface{}) error {
+	return fh.ioctl(cmdRead|cmdWrite, cmd, dest)
+}
+
+func (fh *file_handle) ioctlWrite(cmd uintptr, dest interface{}) error {
+	return fh.ioctl(cmdWrite, cmd, dest)
+}
+
+func (fh *file_handle) ioctl(mode byte, cmd uintptr, dest interface{}) error {
 	t := reflect.TypeOf(dest)
 	if t.Kind() != reflect.Pointer {
 		panic("destination must be a pointer")
 	}
 
-	ioe := ioctl_encode(cmdRead, uint16(t.Elem().Size()), cmd)
+	ioe := ioctl_encode(mode, uint16(t.Elem().Size()), cmd)
 
 	return ioctl(fh.Fd(), ioe, dest)
 }
