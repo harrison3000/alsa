@@ -6,8 +6,8 @@ import (
 	"github.com/yobert/alsa/alsatype"
 )
 
-func NewSequencerClient(name string) (*SeqPort, error) {
-	var port SeqPort
+func NewSequencerClient(name string) (*SeqClient, error) {
+	var port SeqClient
 	var err error
 
 	port.fh.File, err = os.Open("/dev/snd/seq")
@@ -44,7 +44,7 @@ func NewSequencerClient(name string) (*SeqPort, error) {
 	return &port, nil
 }
 
-type SeqPort struct {
+type SeqClient struct {
 	fh file_handle
 
 	clientId int32
