@@ -2,6 +2,7 @@ package alsa
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"syscall"
 )
@@ -38,6 +39,7 @@ func ioctl(fd uintptr, c ioctl_e, ptr interface{}) error {
 	return nil
 }
 
+// gstr converts a null terminated slice of bytes into a string
 func gstr(c []byte) string {
 	for i, v := range c {
 		if v == 0 {
@@ -53,4 +55,19 @@ func ioctl_encode(mode byte, size uint16, cmd uintptr) ioctl_e {
 
 func ioctl_encode_ptr(mode byte, ref interface{}, cmd uintptr) ioctl_e {
 	return ioctl_encode(mode, uint16(reflect.TypeOf(ref).Elem().Size()), cmd)
+}
+
+func ioctl2(f *os.File, cmd ioctl_e, dest any) error {
+	t := reflect.TypeOf(dest)
+	if t.Kind() != reflect.Pointer {
+		panic("destination must be a pointer")
+	}
+	s := t.Elem().Size()
+	if s > 0xffff {
+		panic("destination too big")
+	}
+
+	cmd |= ioctl_e(s) << 16
+
+	return ioctl(f.Fd(), cmd, dest)
 }
