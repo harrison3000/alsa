@@ -17,28 +17,28 @@ const (
 )
 
 func NewSequencerClient(name string) (*SeqClient, error) {
-	var port SeqClient
+	var client SeqClient
 
 	fh, err := os.Open("/dev/snd/seq")
 	if err != nil {
 		return nil, err
 	}
-	port.fh = fh
+	client.fh = fh
 
-	err = ioctl2(fh, cmdSeqPVersion, &port.pversion)
+	err = ioctl2(fh, cmdSeqPVersion, &client.pversion)
 	if err != nil {
 		return nil, err
 	}
 
 	//TODO user pversion
 
-	err = ioctl2(fh, cmdSeqClientId, &port.clientId)
+	err = ioctl2(fh, cmdSeqClientId, &client.clientId)
 	if err != nil {
 		return nil, err
 	}
 
 	clInfo := seq.SeqClientInfo{
-		ClientId: port.clientId,
+		ClientId: client.clientId,
 	}
 
 	err = ioctl2(fh, cmdSeqGetClientInfo, &clInfo)
@@ -53,7 +53,7 @@ func NewSequencerClient(name string) (*SeqClient, error) {
 		return nil, err
 	}
 
-	return &port, nil
+	return &client, nil
 }
 
 func (cli *SeqClient) CreatePort(name string) error {
