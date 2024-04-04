@@ -18,3 +18,23 @@ type SeqClientInfo struct {
 
 	reserved [48]byte
 }
+
+type Addr struct {
+	Client, Port byte
+}
+
+type PortInfo struct {
+	Address      Addr
+	Name         [64]byte
+	Capability   int32
+	Type         int32
+	MidiChannels int32
+	MidiVoices   int32
+	SynthVoices  int32
+	ReadUse      int32
+	WriteUse     int32
+	kernel       uintptr
+	Flags        int32 //TODO specific type?
+	TimeQueue    byte
+	reserved     [59]byte
+}
