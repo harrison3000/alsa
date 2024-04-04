@@ -71,3 +71,19 @@ func ioctl2(f *os.File, cmd ioctl_e, dest any) error {
 
 	return ioctl(f.Fd(), cmd, dest)
 }
+
+// str2cstr converts a Go string into a null terminated string and writes it into the slice
+// if the string is bigger than the slice capacity it gets truncated to fit
+func str2cstr(s string, dest []byte) {
+	dest = dest[:0]
+	maxLen := cap(dest)
+	if len(s) >= maxLen {
+		//TODO truncate at unicode codepoint instead of at a byte
+		s = s[:maxLen-1]
+	}
+	dest = append(dest, s...)
+	dest = append(dest, 0)
+
+	//to make the IDE stop complaining about dest value no being used
+	_ = dest
+}
